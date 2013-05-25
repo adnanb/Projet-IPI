@@ -60,7 +60,6 @@ class Network:
         return data.decode()
 
     def send(self, message):
-        print(message)
         self.socket.sendall(message)
 
 

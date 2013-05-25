@@ -132,6 +132,7 @@ class AuthServer:
         self.magic_code = generate_password(size=20)
         sb = StringBuilder()
         sb.add("4")
+        sb.add(login)
         sb.add(str(self.magic_code))
         game_server = Network(False)
         game_server.setHostAddress(self.game_server_address, self.game_server_port)

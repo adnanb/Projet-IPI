@@ -13,9 +13,12 @@ class Core : public QObject, public Singleton<Core>
 public:
     void setAuthServerAddress(const std::string address, const unsigned short port);
     void setGameServerAddress(const std::string address, const unsigned short port);
-    void login(const std::string login, const std::string password) const;
+    void login(const std::string login, const std::string password);
     void registerToAuth(const std::string login, const std::string password) const;
+    void gameCreate(const std::string name, const std::string nbPlayers, const std::string size, const std::string nbAlign);
     void setWindow(MainWindow* window);
+    void getGamesList();
+    void joinGame(std::string name);
 
 
     void messageHandler(QVector<QString> message);
@@ -23,6 +26,7 @@ public:
 signals:
     void registerState(int code);
     void loginState(int code);
+    void createState(int code);
 
 
 

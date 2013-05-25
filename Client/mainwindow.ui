@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="welcomePage">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -97,32 +97,28 @@
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QPushButton" name="listCreate">
             <property name="text">
              <string>Créer une nouvelle partie</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QPushButton" name="listRefresh">
             <property name="text">
              <string>Actualiser</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QListView" name="listView">
+          <item row="3" column="3">
+           <widget class="QPushButton" name="listQuit">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QPushButton" name="listQuit">
             <property name="text">
              <string>Quitter</string>
             </property>
@@ -135,6 +131,23 @@
             </property>
            </widget>
           </item>
+          <item row="3" column="2">
+           <widget class="QPushButton" name="listConnection">
+            <property name="text">
+             <string>Connexion</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="3">
+           <widget class="QListWidget" name="listWidget"/>
+          </item>
+          <item row="2" column="0" colspan="2">
+           <widget class="QLabel" name="listState">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>
@@ -143,21 +156,21 @@
        <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="1">
-           <widget class="QPushButton" name="CreateCreate">
+          <item row="1" column="3">
+           <widget class="QPushButton" name="createCreate">
             <property name="text">
              <string>Créer</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="2">
+          <item row="1" column="4">
            <widget class="QPushButton" name="createQuit">
             <property name="text">
              <string>Quitter</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="1" column="1">
            <spacer name="horizontalSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -170,7 +183,21 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="0" colspan="2">
+          <item row="1" column="2">
+           <widget class="QLabel" name="createState">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="createPrevious">
+            <property name="text">
+             <string>Précédent</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="4">
            <widget class="QGroupBox" name="groupBox">
             <property name="title">
              <string>Création d'une nouvelle partie</string>
@@ -224,29 +251,22 @@
        </layout>
       </widget>
       <widget class="QWidget" name="waitingPage">
-       <widget class="QPushButton" name="pushButton">
-        <property name="geometry">
-         <rect>
-          <x>450</x>
-          <y>410</y>
-          <width>93</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Quitter</string>
-        </property>
-       </widget>
-       <widget class="QListView" name="listView_2">
-        <property name="geometry">
-         <rect>
-          <x>90</x>
-          <y>120</y>
-          <width>256</width>
-          <height>192</height>
-         </rect>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="1" column="0">
+           <widget class="QPushButton" name="waitQuit">
+            <property name="text">
+             <string>Quitter</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QListView" name="listView_2"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="gamePage">
        <layout class="QHBoxLayout" name="horizontalLayout">
@@ -358,6 +378,22 @@
    <hints>
     <hint type="sourcelabel">
      <x>640</x>
+     <y>490</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>350</x>
+     <y>261</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>waitQuit</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>350</x>
      <y>490</y>
     </hint>
     <hint type="destinationlabel">

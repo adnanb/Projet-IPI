@@ -6,6 +6,7 @@
 #include "Boardview.hpp"
 #include "Game.hpp"
 
+
 namespace Ui {
 class MainWindow;
 }
@@ -18,13 +19,22 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void refreshList(QVector<QString> list);
+    void listState(int code);
+
+
+
 public slots:
     void slotLogin();
     void slotRegister();
+    void slotShowGameCreate();
     void slotGameCreate();
+    void slotRefreshList();
+    void slotConnection();
 
     void slotLoginState(int code);
     void slotRegisterState(int code);
+    void slotCreateState(int code);
 
 private:
     Ui::MainWindow *ui;
