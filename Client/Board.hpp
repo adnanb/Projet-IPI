@@ -16,6 +16,7 @@ public:
     void mousePressEvent(QGraphicsSceneMouseEvent* event);
     
 signals:
+    void play(int x, int y);
     
 public slots:
 

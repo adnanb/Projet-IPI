@@ -20,7 +20,12 @@ public:
     ~MainWindow();
 
     void refreshList(QVector<QString> list);
-    void listState(int code);
+    void listState(QVector<QString>);
+    void waitState(int code);
+    void setGameInfos(QVector<QString> list);
+    void setNewGame(QVector<QString> params);
+    void addPlayer(QVector<QString> player);
+    void launchGame();
 
 
 
@@ -31,6 +36,8 @@ public slots:
     void slotGameCreate();
     void slotRefreshList();
     void slotConnection();
+    void slotLaunchGame();
+    void slotPlay(int x, int y);
 
     void slotLoginState(int code);
     void slotRegisterState(int code);

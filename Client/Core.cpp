@@ -50,35 +50,34 @@ void Core::gameCreate(const std::string name, const std::string nbPlayers, const
 
 void Core::messageHandler(QVector<QString> message)
 {
-    QString code = message[0];
+    int code = message[0].toInt();
+    message.remove(0);
 
-    if(code == "1")
+    switch(code)
     {
+    case 1:
         m_authServer.disconnectFromHost();
-        emit registerState(message[1].toInt());
+        emit registerState(message[0].toInt());
+        break;
 
-    }
-
-    if(code == "3")
-    {
+    case 3:
         m_authServer.disconnectFromHost();
-        if(message[1] == "0")
+        if(message[0] == "0")
         {
             m_gameServer.connectToHost();
             NetstringBuilder str;
-            str << "6" << m_login << message[2].toStdString();
+            str << "6" << m_login << message[1].toStdString();
             m_gameServer.sendToHost(str);
             emit loginState(2);
         }
         else
         {
-            emit loginState(message[1].toInt());
+            emit loginState(message[0].toInt());
         }
-    }
+        break;
 
-    if(code == "7")
-    {
-        if(message[1] == "0")
+    case 7:
+        if(message[0] == "0")
         {
             emit loginState(0);
         }
@@ -87,21 +86,39 @@ void Core::messageHandler(QVector<QString> message)
             m_gameServer.disconnectFromHost();
             emit loginState(3);
         }
-    }
+        break;
 
-    if(code == "9")
-        emit createState(message[1].toInt());
+    case 9:
+        emit createState(message[0].toInt());
+        break;
 
-    if(code == "11")
-        m_window->listState(message[1].toInt());
+    case 11:
+        m_window->listState(message);
+        break;
 
-    if(code == "24")
-    {
-        //On supprime le code du mesage, seul le message nous intéresse
-        message.remove(0);
+    case 24:
         m_window->refreshList(message);
-    }
+        break;
 
+    case 13:
+        //Un joueur vient d'entrer dans la partie
+        m_window->addPlayer(message);
+        break;
+
+    case 15:
+        qDebug() << "15" << message[0];
+        m_window->waitState(message[0].toInt());
+        break;
+
+    case 17:
+        m_window->launchGame();
+        break;
+
+    case 25:
+        m_window->setGameInfos(message);
+        break;
+
+    }
 
 }
 
@@ -125,4 +142,16 @@ void Core::joinGame(std::string name)
     NetstringBuilder str;
     str << "10" << name;
     m_gameServer.sendToHost(str);
+}
+
+void Core::launchGame()
+{
+    NetstringBuilder str;
+    str << "12";
+    m_gameServer.sendToHost(str);
+}
+
+std::string Core::getLogin()
+{
+    return m_login;
 }

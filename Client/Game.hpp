@@ -2,22 +2,30 @@
 
 #include "Player.hpp"
 #include <QVector>
+#include <QString>
 
 class Game
 {
 public:
-    Game(int size, int alignment, int nbPlayers);
+    Game(std::string name, int nbPlayers, int size, int nbAlignments, std::string admin);
     ~Game(void);
 
+    std::string getName();
+    int getNbPlayers();
     int getSize(void);
-    void addPlayer(Player* player);
-    void play(int x, int y, Player* player);
+    int getNbAlignments();
+    std::string getAdmin();
+    void addPlayer(QString player);
+    void play(int x, int y, std::string player);
 
 private:
-    int m_nbAlignment;
+    std::string m_name;
     int m_nbPlayers;
     int m_size;
+    int m_nbAlignments;
+    std::string m_admin;
+
     //m_grid;
-    QVector<Player*> m_players;
+    QVector<QString> m_players;
 
 };

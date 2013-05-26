@@ -8,6 +8,7 @@ from passlib.utils import getrandstr, rng
 from StringUtils import *
 from Network import Network
 from Game import Game
+from Player import Player
 
 class GameServer:
     def __init__(self, listening_port):
@@ -18,6 +19,7 @@ class GameServer:
         print("*********************************************")
         self.listening_port = listening_port
         self.allowed_users = {}
+        self.connected_users = {}
         self.games = {}
 
 
@@ -57,51 +59,95 @@ class GameServer:
         self.games[name] = new_game
         return new_game
 
-    def joinGame(self, login, game_name):
+    def joinGame(self, player, game_name):
         game = self.games[game_name]
         if game == None:
             return 2
         if len(game.players) >= game.nb_players:
             return 1
-        game.players.append(login)
+        if player.name in game.players:
+            return 3
+        game.players.append(player)
         return 0
 
+    def send_to_game_players(self, game_name, message):
+        game_players = self.games[game_name].players
+        for p in game_players:
+            p.connection.send(message.data.encode())
 
-    def dedicated_handle(self, connection, login):
+    def launch_game(self, player):
+        if player.game == None:
+            return 1
+
+        if player.game.admin.name != player.name:
+            return 2
+
+        player.game.waiting == False
+        sb = StringBuilder()
+        sb.add("17")
+        self.send_to_game_players(player.game.name, sb)
+        return 0
+
+    def dedicated_handle(self, player):
         while True:
-            mess = connection.receive()
-            game = None
+            mess = player.connection.receive()
             args = StringExtract(mess)
             sb = StringBuilder()
 
+            #Le client veut créer une partie
             if args[0] == '8':
                 sb.add("9")
                 name = args[1]
                 nb_players = int(args[2])
                 size = int(args[3])
                 nb_alignments = int(args[4])
-                game = self.game_create(name, nb_players, size, nb_alignments)
-                if game != None:
-                    game.admin = login
-                    game.players.append(login)
+                player.game = self.game_create(name, nb_players, size, nb_alignments)
+                if player.game != None:
+                    player.game.admin = player
                     sb.add("0")
                     print (self.games)
                 else:
                     sb.add("1")
-                connection.send(sb.data.encode())
 
+            #Le client veut obtenir la liste des parties qu'il peut rejoindre
             if args[0] == '19':
                 sb.add("24")
                 for n, g in self.games.items():
                     sb.add(n)
                     sb.add(str(len(g.players)))
                     sb.add(str(g.nb_players))
-                connection.send(sb.data.encode())
 
+            #Le client veut rejoindre une partie
             if args[0] == '10':
+                game_name = args[1]
+                res = self.joinGame(player, game_name)
                 sb.add("11")
-                sb.add(str(self.joinGame(login, args[1])))
-                connection.send(sb.data.encode())
+                if res == 0:
+                    #On prévient les autres joueurs
+                    sb2 = StringBuilder()
+                    sb2.add("13")
+                    for p in self.games[game_name].players:
+                        sb2.add(p.name)
+                    self.send_to_game_players(game_name, sb2)
+                    #On répond au joueur qui veut rejoindre la partie
+                    sb.add("0")
+                    player.game = self.games[game_name]
+                    #On envoie les infos de parties
+                    sb.add(game_name)
+                    sb.add(str(player.game.nb_players))
+                    sb.add(str(player.game.size))
+                    sb.add(str(player.game.nb_alignments))
+                    sb.add(player.game.admin.name)
+                else:
+                    sb.add(str(res))
+                
+            if args[0] == '12':
+                res = self.launch_game(player)
+                sb.add("15")
+                sb.add(str(res))
+
+            player.connection.send(sb.data.encode())
+
 
 
     #Que puis-je faire pour vous mon bon monsieur ?
@@ -121,12 +167,17 @@ class GameServer:
             connection.send(sb.data.encode())
 
         if args[0] == '6':
+            login = args[1]
+            magic_code = args[2]
             sb.add("7")
-            check = self.check_if_allowed(args[1], args[2])
+            check = self.check_if_allowed(login, magic_code)
             if check == 1:
                 sb.add("0")
                 connection.send(sb.data.encode())
-                self.dedicated_handle(connection, args[1])
+                del self.allowed_users[login]
+                self.connected_users[login] = Player(login, connection)
+                player = self.connected_users[login]
+                self.dedicated_handle(player)
             else:
                 sb.add("1")
                 connection.send(sb.data.encode())

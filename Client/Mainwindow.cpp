@@ -9,16 +9,20 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_game(new Game(7, 7, 7))
+    m_game(NULL)
+    //m_game(new Game(7, 7, 7))
 {
-    m_board = new Board(0, m_game);
-    m_view = new BoardView(m_board);
+    //m_board = new Board(0, m_game);
+    //m_view = new BoardView(m_board);
     ui->setupUi(this);
-    ui->gamePage->layout()->addWidget(m_view);
-    m_view->setMinimumSize(m_game->getSize()*75, m_game->getSize()*75);
-    m_view->setMaximumSize(m_game->getSize()*75, m_game->getSize()*75);
-    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //ui->gamePage->layout()->addWidget(m_view);
+    //m_view->setMinimumSize(m_game->getSize()*75, m_game->getSize()*75);
+    //m_view->setMaximumSize(m_game->getSize()*75, m_game->getSize()*75);
+    //m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //m_view->setMinimumSize(800, 600);
+    //m_view->setMaximumSize(800, 600);
+    //setMinimumSize(800, 600);
     setMaximumSize(0, 0);
     connect(ui->welcomeCreate, SIGNAL(clicked()),this,SLOT(slotRegister()));
     connect(ui->welcomeConnect, SIGNAL(clicked()),this,SLOT(slotLogin()));
@@ -27,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->listRefresh, SIGNAL(clicked()), this, SLOT(slotRefreshList()));
     connect(ui->createPrevious, SIGNAL(clicked()), this, SLOT(slotRefreshList()));
     connect(ui->listConnection, SIGNAL(clicked()), this, SLOT(slotConnection()));
+    connect(ui->waitLaunch, SIGNAL(clicked()), this, SLOT(slotLaunchGame()));
 }
 
 MainWindow::~MainWindow()
@@ -52,16 +57,133 @@ void MainWindow::refreshList(QVector<QString> list)
     }
 }
 
-void MainWindow::listState(int code)
+void MainWindow::listState(QVector<QString> message)
 {
-    if(code == 0)
+    int code = message[0].toInt();
+    message.remove(0);
+    switch(code)
     {
+    case 0:
+        setNewGame(message);
+        ui->waitName->setText(message[0]);
+        ui->waitNbPlayers->setText(message[1]);
+        ui->waitSize->setText(message[2]);
+        ui->waitNbAlign->setText(message[3]);
         ui->stackedWidget->setCurrentWidget(ui->waitingPage);
+
+        if(Core::Instance().getLogin() == m_game->getAdmin())
+            ui->waitLaunch->setDisabled(false);
+        break;
+
+    case 1:
+        ui->listWidget->setDisabled(false);
+        if(ui->stackedWidget->currentWidget() == ui->listPage)
+        {
+            ui->listState->setText("La partie est pleine.");
+        }
+        else
+        {
+            ui->createState->setText("La partie est pleine.");
+        }
+        break;
+
+    case 2:
+        ui->listWidget->setDisabled(false);
+        if(ui->stackedWidget->currentWidget() == ui->listPage)
+        {
+            ui->listState->setText("La partie n'est plus joignable.");
+        }
+        else
+        {
+            ui->createState->setText("La partie n'est plus joignable.");
+        }
+        break;
+
+    case 3:
+        ui->listWidget->setDisabled(false);
+        if(ui->stackedWidget->currentWidget() == ui->listPage)
+        {
+            ui->listState->setText("Vous avez déjà rejoint la partie.");
+        }
+        else
+        {
+            ui->createState->setText("Vous avez déjà rejoint la partie.");
+        }
+        break;
     }
-    else
+
+}
+
+void MainWindow::waitState(int code)
+{
+    switch(code)
     {
-        ui->listState->setText("La partie n'est plus joignable.");
+    case 0:
+        ui->waitState->setText("Lancement de la partie.");
+        break;
+
+    case 1:
+        ui->waitState->setText("Vous n'avez rejoint aucune partie.");
+        break;
+
+    case 2:
+        ui->waitState->setText("Vous n'etes pas l'administrateur de la partie.");
+        break;
+
+    default:
+        ui->waitState->setText("Problème serveur.");
     }
+}
+
+void MainWindow::setNewGame(QVector<QString> params)
+{
+    std::string name = params[0].toStdString();
+    int nbPlayers = params[1].toInt();
+    int size = params[2].toInt();
+    int nbAlign = params[3].toInt();
+    std::string admin = params[4].toStdString();
+
+    if(m_game)
+        delete m_game;
+
+    m_game = new Game(name, nbPlayers, size, nbAlign, admin);
+    m_board = new Board(0, m_game);
+    m_view = new BoardView(m_board);
+    connect(m_board, SIGNAL(play(int,int)), this, SLOT(slotPlay(int, int)));
+}
+
+//On récupère la liste de tous les joueurs présents dont le nouveau joueur, c'est plus facile
+void MainWindow::addPlayer(QVector<QString> player)
+{
+    while(ui->waitList->count() != 0)
+    {
+        QListWidgetItem* item = ui->waitList->takeItem(0);
+        delete item;
+    }
+
+    for(int i = 0; i < player.count(); i++)
+    {
+        m_game->addPlayer(player[i]);
+        new QListWidgetItem(player[i], ui->waitList);
+    }
+
+}
+
+void MainWindow::launchGame()
+{
+    ui->gamePage->layout()->addWidget(m_view);
+    m_view->setMinimumSize(m_game->getSize()*75, m_game->getSize()*75);
+    m_view->setMaximumSize(m_game->getSize()*75, m_game->getSize()*75);
+    ui->stackedWidget->setCurrentWidget(ui->gamePage);
+}
+
+void MainWindow::setGameInfos(QVector<QString> list)
+{
+
+    ui->waitName->setText(list[0]);
+    ui->waitNbPlayers->setText(list[1]);
+    ui->waitSize->setText(list[2]);
+    ui->waitNbAlign->setText(list[3]);
 }
 
 void MainWindow::slotLogin()
@@ -147,7 +269,9 @@ void MainWindow::slotCreateState(int code)
 {
     if(code == 0)
     {
-        ui->stackedWidget->setCurrentWidget(ui->waitingPage);
+        ui->createState->setText("Connexion à la partie.");
+        qDebug() << ui->createName->text();
+        Core::Instance().joinGame(ui->createName->text().toStdString());
     }
     else
     {
@@ -170,6 +294,7 @@ void MainWindow::slotRefreshList()
 void MainWindow::slotConnection()
 {
     QListWidgetItem* item = ui->listWidget->currentItem();
+    ui->listWidget->setDisabled(true);
     //on vérifie qu'une partie a été sélectionnée
     if(item)
     {
@@ -177,4 +302,15 @@ void MainWindow::slotConnection()
         QString name = item->text().split("\n")[0];
         Core::Instance().joinGame(name.toStdString());
     }
+}
+
+void MainWindow::slotLaunchGame()
+{
+    Core::Instance().launchGame();
+}
+
+void MainWindow::slotPlay(int x, int y)
+{
+    //Core::Instance().play(x, y);
+    qDebug() << x << y;
 }

@@ -21,7 +21,7 @@ Board::Board(QWidget* parent, Game *game) :
             Square* plop = new Square();
             plop->setPosition(i, j);
             plop->setPath(square);
-            plop->setPos(70*j, 70*i);
+            plop->setPos(70*i, 70*j);
             plop->setBrush(QBrush(QColor(171,200,226)));
             plop->setPen(QPen(QColor(171,200,226)));
             //QGraphicsPathItem* item = new QGraphicsPathItem(*plop);
@@ -59,8 +59,10 @@ void Board::resizeEvent(QResizeEvent* event)
 void Board::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
     Square* square = (Square*)itemAt(event->scenePos().x(), event->scenePos().y(), QTransform());
-    if(square)
-        qDebug() << square->getX();
+    if (square)
+        emit play(square->getX(), square->getY());
+    /*if(square)
+        qDebug() << square->getX();*/
    //qDebug() << square->getX() << square->getY();
     //qDebug() << event->scenePos().x();
 

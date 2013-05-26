@@ -4,10 +4,9 @@ class Game:
     	self.name = name
     	self.nb_players = nb_players
     	self.size = size
-    	self.nb_alignements = nb_alignments
+    	self.nb_alignments = nb_alignments
     	self.size = size
     	self.grid = []
     	self.players = []
     	self.waiting = True
-    	self.players = []
     	self.admin = None
