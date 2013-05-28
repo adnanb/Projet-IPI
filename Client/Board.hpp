@@ -8,20 +8,11 @@ class Board : public QGraphicsScene
     Q_OBJECT
 public:
     explicit Board(QWidget *parent = 0, Game* game = NULL);
-
-    void createGrid();
-
-    void resizeEvent(QResizeEvent*);
-
     void mousePressEvent(QGraphicsSceneMouseEvent* event);
+    void update();
     
 signals:
     void play(int x, int y);
-    
-public slots:
-
-private:
-    virtual void paintEvent(QPaintEvent* event);
 
 private:
     QGraphicsScene* m_scene;

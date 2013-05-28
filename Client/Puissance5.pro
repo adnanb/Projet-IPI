@@ -23,7 +23,8 @@ SOURCES +=\
     Network.cpp \
     Player.cpp \
     Square.cpp \
-    Singleton.cpp
+    Singleton.cpp \
+    SquareView.cpp
 
 HEADERS  += \
     Board.hpp \
@@ -35,6 +36,7 @@ HEADERS  += \
     Player.hpp \
     Square.hpp \
     StringUtils.hpp \
-    Singleton.hpp
+    Singleton.hpp \
+    SquareView.hpp
 
 FORMS    += mainwindow.ui

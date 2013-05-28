@@ -1,6 +1,7 @@
 from StringUtils import StringExtract
 import socket
 import ssl
+from threading import Lock
 
 class Network:
     def __init__(self, server_side):
@@ -14,6 +15,7 @@ class Network:
         #Chargement du certificat
         self.context.load_cert_chain("cert.pem")
         self.socket = self.context.wrap_socket(new_socket, server_side)
+        self.lock = Lock()
 
     def setSocket(self, socket, server_side):
         self.socket = self.context.wrap_socket(socket, server_side)

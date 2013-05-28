@@ -59,7 +59,7 @@ class GameServer:
         self.games[name] = new_game
         return new_game
 
-    def joinGame(self, player, game_name):
+    def join_game(self, player, game_name):
         game = self.games[game_name]
         if game == None:
             return 2
@@ -110,7 +110,7 @@ class GameServer:
                     sb.add("1")
 
             #Le client veut obtenir la liste des parties qu'il peut rejoindre
-            if args[0] == '19':
+            if args[0] == '20':
                 sb.add("24")
                 for n, g in self.games.items():
                     sb.add(n)
@@ -120,7 +120,7 @@ class GameServer:
             #Le client veut rejoindre une partie
             if args[0] == '10':
                 game_name = args[1]
-                res = self.joinGame(player, game_name)
+                res = self.join_game(player, game_name)
                 sb.add("11")
                 if res == 0:
                     #On prévient les autres joueurs
@@ -145,6 +145,16 @@ class GameServer:
                 res = self.launch_game(player)
                 sb.add("15")
                 sb.add(str(res))
+
+            if args[0] == '14':
+                x = args[1]
+                y = args[2]
+                _player = args[3]
+                sb.add("19")
+                sb.add(x)
+                sb.add(y)
+                sb.add(_player)
+                self.send_to_game_players(player.game.name, sb)
 
             player.connection.send(sb.data.encode())
 

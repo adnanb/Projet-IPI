@@ -21,6 +21,7 @@ public:
     void joinGame(std::string name);
     void launchGame();
     std::string getLogin();
+    void play(int x, int y);
 
 
     void messageHandler(QVector<QString> message);

@@ -52,4 +52,4 @@ Singleton& operator = (const Singleton&);
     Class& Class::Instance() \
     { \
         return Singleton<Class>::Instance(); \
-    } \
+    }

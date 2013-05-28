@@ -1,21 +1,25 @@
 #include "Square.hpp"
 
-Square::Square(QObject* parent):
-    QGraphicsPathItem()
+Square::Square():
+    m_state(0),
+    m_player("")
 {
-    //addRoundedRect(0,0,64,64,10,10);
 }
-
-/*Square::Square(QPainterPath path, QObject* parent):
-    QPainterPath(path)
-{
-    addRoundedRect(0,0,64,64,10,10);
-}*/
 
 void Square::setPosition(int x, int y)
 {
     m_x = x;
     m_y = y;
+}
+
+void Square::setState(int state)
+{
+    m_state = state;
+}
+
+void Square::setPlayer(std::string player)
+{
+    m_player = player;
 }
 
 int Square::getX()
@@ -26,4 +30,14 @@ int Square::getX()
 int Square::getY()
 {
     return m_y;
+}
+
+int Square::getState()
+{
+    return m_state;
+}
+
+std::string Square::getPlayer()
+{
+    return m_player;
 }

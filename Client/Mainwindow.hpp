@@ -26,6 +26,7 @@ public:
     void setNewGame(QVector<QString> params);
     void addPlayer(QVector<QString> player);
     void launchGame();
+    void play(int x, int y, QString player);
 
 
 

@@ -5,7 +5,6 @@
 #include "StringUtils.hpp"
 #include "Core.hpp"
 
-//class Core;
 
 Network::Network():
     m_blockSize(0),

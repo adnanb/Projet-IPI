@@ -2,6 +2,7 @@
 #include <QSslSocket>
 #include <string>
 #include "StringUtils.hpp"
+#include <boost/lexical_cast.hpp>
 
 SINGLETON_IMPL(Core)
 
@@ -106,13 +107,22 @@ void Core::messageHandler(QVector<QString> message)
         break;
 
     case 15:
-        qDebug() << "15" << message[0];
         m_window->waitState(message[0].toInt());
         break;
 
     case 17:
         m_window->launchGame();
         break;
+
+    //Un joueur a joué
+    case 19:
+    {
+        int x = message[0].toInt();
+        int y = message[1].toInt();
+        QString player = message[2];
+        m_window->play(x, y, player);
+        break;
+    }
 
     case 25:
         m_window->setGameInfos(message);
@@ -133,7 +143,7 @@ void Core::setWindow(MainWindow* window)
 void Core::getGamesList()
 {
     NetstringBuilder str;
-    str << "19";
+    str << "20";
     m_gameServer.sendToHost(str);
 }
 
@@ -154,4 +164,13 @@ void Core::launchGame()
 std::string Core::getLogin()
 {
     return m_login;
+}
+
+void Core::play(int x, int y)
+{
+    NetstringBuilder str;
+    std::string _x = boost::lexical_cast<std::string>(x);
+    std::string _y = boost::lexical_cast<std::string>(y);
+    str << "14" << _x << _y << m_login;
+    m_gameServer.sendToHost(str);
 }

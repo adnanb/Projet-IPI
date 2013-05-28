@@ -1,6 +1,6 @@
 #include "Board.hpp"
 #include <QGraphicsPixmapItem>
-#include "Square.hpp"
+#include "SquareView.hpp"
 #include <QGraphicsSceneEvent>
 #include <QTransform>
 #include <QDebug>
@@ -14,56 +14,73 @@ Board::Board(QWidget* parent, Game *game) :
     QPainterPath square;
     square.addRoundedRect(0,0,64,64,10,10);
 
-    for(int i=0; i<size; i++)
+    for(int j=0; j<size; j++)
     {
-        for(int j=0; j<size; j++)
+        for(int i=0; i<size; i++)
         {
-            Square* plop = new Square();
-            plop->setPosition(i, j);
+            SquareView* plop = new SquareView(0, m_game->getSquare(i, j));
             plop->setPath(square);
             plop->setPos(70*i, 70*j);
-            plop->setBrush(QBrush(QColor(171,200,226)));
-            plop->setPen(QPen(QColor(171,200,226)));
-            //QGraphicsPathItem* item = new QGraphicsPathItem(*plop);
+            plop->setBrush(QBrush(QColor(181,230,85)));
+            plop->setPen(QPen(QColor(181,230,85)));
             addItem(plop);
-            //addPath(*plop,QPen(QColor(20,255,180)), QBrush(QColor(20,255,180)))->setPos(70*j, 70*i);
-            //addPixmap(QPixmap("../Puissance5/assets/green_case.png", 0, Qt::AutoColor).scaled(48,48))->setPos(55*j, 55*i);
-            //painter.drawPixmap(100*j,100*i,48,48,QPixmap("../Puissance5/assets/green_case.png", 0, Qt::AutoColor));
+        }
+    }
+}
+
+
+void Board::update()
+{
+    clear();
+    int size = m_game->getSize();
+
+    QList<QGraphicsItem*> item = items();
+    for(int i=0; i<item.size(); i++)
+    {
+        removeItem(item[i]);
+        delete item[i];
+    }
+
+
+    QPainterPath square_item;
+    square_item.addRoundedRect(0,0,64,64,10,10);
+
+    for(int j=0; j<size; j++)
+    {
+        for(int i=0; i<size; i++)
+        {
+            Square* square = m_game->getSquare(i, j);
+            SquareView* plop = new SquareView(0, square);
+            plop->setPath(square_item);
+            plop->setPos(70*i, 70*j);
+            switch(square->getState())
+            {
+            case 0:
+                plop->setBrush(QBrush(QColor(181,230,85)));
+                plop->setPen(QPen(QColor(181,230,85)));
+                break;
+
+            case 1:
+                plop->setBrush(QBrush(QColor(1,176,240)));
+                plop->setPen(QPen(QColor(1,176,240)));
+                break;
+
+            case 2:
+                plop->setBrush(QBrush(QColor(255,53,139)));
+                plop->setPen(QPen(QColor(255,53,139)));
+                break;
+
+            }
+
+            addItem(plop);
         }
     }
 
-    //m_scene->addRect(10,10,10,10, QPen(QColor(255, 0, 100, 255)), QBrush(QColor(255, 0, 100, 255), Qt::SolidPattern));
-}
-
-
-void Board::paintEvent(QPaintEvent* event)
-{
-
-}
-
-void Board::createGrid()
-{
-    /*QPainter* painter = new QPainter(this);
-    painter->setRenderHint(QPainter::Antialiasing, true);*/
-    //addRect(100,100,100,100, QPen(QColor(255, 0, 100, 255)), QBrush(QColor(255, 0, 100, 255), Qt::SolidPattern));
-    //m_scene->render(painter);
-}
-
-
-void Board::resizeEvent(QResizeEvent* event)
-{
-    clear();
-    Board::createGrid();
 }
 
 void Board::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    Square* square = (Square*)itemAt(event->scenePos().x(), event->scenePos().y(), QTransform());
-    if (square)
-        emit play(square->getX(), square->getY());
-    /*if(square)
-        qDebug() << square->getX();*/
-   //qDebug() << square->getX() << square->getY();
-    //qDebug() << event->scenePos().x();
-
+    SquareView* square = (SquareView*)itemAt(event->scenePos().x(), event->scenePos().y(), QTransform());
+    if (square && (square->getSquare()->getState() == 0))
+        emit play(square->getSquare()->getX(), square->getSquare()->getY());
 }

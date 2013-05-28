@@ -1,21 +1,24 @@
 #pragma once
 
-#include <QGraphicsPathItem>
+#include "Square.hpp"
+#include <string>
 
-class Square : public QGraphicsPathItem
+class Square
 {
 public:
-    explicit Square(QObject *parent = 0);
+    Square();
 
     void setPosition(int x, int y);
+    void setState(int state);
+    void setPlayer(std::string player);
     int getX();
     int getY();
-
-signals:
-    
-public slots:
+    int getState();
+    std::string getPlayer();
 
 private:
     int m_x;
     int m_y;
+    int m_state;
+    std::string m_player;
 };

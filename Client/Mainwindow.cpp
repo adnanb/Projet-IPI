@@ -9,20 +9,11 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_game(NULL)
-    //m_game(new Game(7, 7, 7))
+    m_game(NULL),
+    m_board(NULL),
+    m_view(NULL)
 {
-    //m_board = new Board(0, m_game);
-    //m_view = new BoardView(m_board);
     ui->setupUi(this);
-    //ui->gamePage->layout()->addWidget(m_view);
-    //m_view->setMinimumSize(m_game->getSize()*75, m_game->getSize()*75);
-    //m_view->setMaximumSize(m_game->getSize()*75, m_game->getSize()*75);
-    //m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    //m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    //m_view->setMinimumSize(800, 600);
-    //m_view->setMaximumSize(800, 600);
-    //setMinimumSize(800, 600);
     setMaximumSize(0, 0);
     connect(ui->welcomeCreate, SIGNAL(clicked()),this,SLOT(slotRegister()));
     connect(ui->welcomeConnect, SIGNAL(clicked()),this,SLOT(slotLogin()));
@@ -36,8 +27,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete m_board;
-    delete m_view;
+    if(m_game)
+        delete m_game;
+    if(m_view)
+        delete m_view;
+    if(m_board)
+        delete m_board;
     delete ui;
 }
 
@@ -177,6 +172,12 @@ void MainWindow::launchGame()
     ui->stackedWidget->setCurrentWidget(ui->gamePage);
 }
 
+void MainWindow::play(int x, int y, QString player)
+{
+    m_game->play(x, y, player.toStdString());
+    m_board->update();
+}
+
 void MainWindow::setGameInfos(QVector<QString> list)
 {
 
@@ -311,6 +312,5 @@ void MainWindow::slotLaunchGame()
 
 void MainWindow::slotPlay(int x, int y)
 {
-    //Core::Instance().play(x, y);
-    qDebug() << x << y;
+    Core::Instance().play(x, y);
 }
